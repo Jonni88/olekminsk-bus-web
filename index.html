@@ -2,15 +2,29 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#667eea">
-    <title>Автобусы Олёкминск</title>
+    <meta name="apple-mobile-web-app-title" content="Автобусы">
+    <meta name="theme-color" content="#667eea" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1a1a2e" media="(prefers-color-scheme: dark)">
+    <meta name="description" content="Расписание автобусов Олёкминска">
+    
+    <!-- iOS Icons -->
+    <link rel="apple-touch-icon" href="icon-180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="icon-167.png">
+    <link rel="apple-touch-startup-image" href="splash-1242x2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)">
+    
+    <!-- PWA -->
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <title>Автобусы Олёкминск</title>
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         :root {
             --primary: #667eea;
             --primary-dark: #764ba2;
@@ -18,83 +32,261 @@
             --bg: #f5f7fa;
             --card: #ffffff;
             --text: #333333;
+            --text-light: #666666;
+            --border: #e0e0e0;
         }
+        
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0f0f23;
+                --card: #1a1a2e;
+                --text: #e4e4e7;
+                --text-light: #a1a1aa;
+                --border: #27273a;
+            }
+        }
+        
+        /* Safe area for iOS notch */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-font-smoothing: antialiased;
         }
+        
+        /* iOS PWA standalone mode */
+        @media (display-mode: standalone) {
+            body {
+                padding-top: max(20px, env(safe-area-inset-top));
+            }
+            .header {
+                padding-top: max(50px, env(safe-area-inset-top) + 20px) !important;
+            }
+        }
+        
         .header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             padding: 40px 20px 25px;
             text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .header h1 { font-size: 1.5rem; }
+        
+        .header h1 { font-size: 1.4rem; font-weight: 700; }
+        
         .current-time {
             background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
             display: inline-block;
-            padding: 8px 20px;
-            border-radius: 20px;
+            padding: 10px 24px;
+            border-radius: 25px;
             margin-top: 15px;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 600;
+            font-variant-numeric: tabular-nums;
         }
+        
         .nav-tabs {
             display: flex;
-            background: white;
-            border-bottom: 1px solid #e0e0e0;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
+        .nav-tabs::-webkit-scrollbar { display: none; }
+        
         .nav-tab {
             flex: 1;
-            padding: 16px;
+            min-width: 80px;
+            padding: 16px 12px;
             background: none;
             border: none;
-            font-size: 0.9rem;
-            color: #666;
+            font-size: 0.85rem;
+            color: var(--text-light);
             cursor: pointer;
+            white-space: nowrap;
+            transition: color 0.2s;
         }
         .nav-tab.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
-        .main-content { padding: 20px; }
+        
+        .main-content { padding: 16px; max-width: 600px; margin: 0 auto; }
+        
         .routes-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
         }
-        @media (min-width: 768px) {
+        
+        @media (min-width: 400px) {
             .routes-grid { grid-template-columns: repeat(3, 1fr); }
         }
-        @media (min-width: 1024px) {
-            .routes-grid { grid-template-columns: repeat(4, 1fr); }
-        }
+        
         .route-card {
             background: var(--card);
             border-radius: 16px;
-            padding: 20px;
+            padding: 20px 16px;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--border);
         }
-        .route-number { font-size: 2rem; font-weight: 800; color: var(--primary); }
-        .route-type { font-size: 0.7rem; text-transform: uppercase; padding: 2px 8px; border-radius: 10px; }
+        .route-card:active { transform: scale(0.96); }
+        
+        .route-number { 
+            font-size: 1.8rem; 
+            font-weight: 800; 
+            color: var(--primary);
+            line-height: 1;
+        }
+        .route-type { 
+            font-size: 0.65rem; 
+            text-transform: uppercase; 
+            padding: 3px 8px; 
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 6px;
+            font-weight: 600;
+        }
         .route-type.urban { background: #dbeafe; color: #1e40af; }
         .route-type.suburban { background: #d1fae5; color: #065f46; }
+        .route-type.intercity { background: #fde68a; color: #92400e; }
+        
+        @media (prefers-color-scheme: dark) {
+            .route-type.urban { background: #1e3a5f; color: #93c5fd; }
+            .route-type.suburban { background: #064e3b; color: #6ee7b7; }
+            .route-type.intercity { background: #78350f; color: #fcd34d; }
+        }
+        
+        .route-name {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 8px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        /* iOS Add to Home Screen Prompt */
+        .ios-install-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card);
+            border-top: 1px solid var(--border);
+            padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: none;
+        }
+        .ios-install-banner.show { display: block; }
+        
+        .ios-install-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .ios-install-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .ios-install-text {
+            flex: 1;
+        }
+        .ios-install-text h3 {
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+        .ios-install-text p {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+        
+        .ios-install-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 8px;
+        }
+        
+        /* Share icon hint */
+        .share-icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 4px;
+        }
+        
+        /* Offline bar */
         .offline-bar {
-            position: fixed; top: 0; left: 0; right: 0;
-            background: #ff9800; color: white;
-            text-align: center; padding: 10px;
-            display: none; z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #f59e0b;
+            color: white;
+            text-align: center;
+            padding: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: none;
+            z-index: 2000;
         }
         .offline-bar.show { display: block; }
+        
+        /* Loading */
         .loading {
             text-align: center;
-            padding: 40px;
-            color: #666;
+            padding: 60px 20px;
+            color: var(--text-light);
         }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Pull to refresh indicator */
+        .ptr-indicator {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .ptr-indicator.show { opacity: 1; }
     </style>
 </head>
 <body>
-    <div class="offline-bar" id="offlineBar">📴 Офлайн режим — показано сохранённое расписание</div>
+    <div class="offline-bar" id="offlineBar">📴 Нет подключения — показано сохранённое расписание</div>
     
     <header class="header">
         <h1>🚌 Автобусы Олёкминск</h1>
@@ -105,37 +297,85 @@
         <button class="nav-tab active" data-tab="all">Все</button>
         <button class="nav-tab" data-tab="urban">Городские</button>
         <button class="nav-tab" data-tab="suburban">Пригород</button>
-        <button class="nav-tab" data-tab="intercity">Межгород</button>
+        <button class="nav-tab" data-tab="intercity">Междугородние</button>
     </nav>
     
+    <div class="ptr-indicator" id="ptrIndicator">⬇️ Отпустите для обновления</div>
+    
     <main class="main-content">
-        <div id="loading" class="loading">Загрузка расписания...</div>
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            Загрузка расписания...
+        </div>
         <div id="routesGrid" class="routes-grid" style="display:none;"></div>
     </main>
+    
+    <!-- iOS Install Banner -->
+    <div class="ios-install-banner" id="iosInstallBanner">
+        <div class="ios-install-content">
+            <div class="ios-install-icon">🚌</div>
+            <div class="ios-install-text">
+                <h3>Установить приложение</h3>
+                <p>Нажмите <span class="share-icon">📤</span> «Поделиться», затем «На экран «Домой»»</p>
+            </div>
+            <button class="ios-install-close" onclick="dismissInstallBanner()">×</button>
+        </div>
+    </div>
 
     <script>
-        // API Configuration - замените на ваш URL
+        // API Configuration
         const API_URL = 'https://your-api.com/api/routes';
-        
-        // LocalStorage
-        const STORAGE_KEY = 'bus_routes_v1';
+        const STORAGE_KEY = 'bus_routes_v2';
         let routesData = [];
         let currentFilter = 'all';
 
+        // Check if running as iOS PWA
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isStandalone = window.navigator.standalone === true;
+        const isPWA = window.matchMedia('(display-mode: standalone)').matches || isStandalone;
+
+        // Show install banner for iOS Safari (not in PWA mode)
+        function checkInstallBanner() {
+            const bannerDismissed = localStorage.getItem('ios_banner_dismissed');
+            
+            if (isIOS && !isStandalone && !bannerDismissed) {
+                // Show after 3 seconds
+                setTimeout(() => {
+                    document.getElementById('iosInstallBanner').classList.add('show');
+                }, 3000);
+            }
+        }
+
+        function dismissInstallBanner() {
+            document.getElementById('iosInstallBanner').classList.remove('show');
+            localStorage.setItem('ios_banner_dismissed', 'true');
+        }
+
         // Load routes
-        async function loadRoutes() {
+        async function loadRoutes(force = false) {
+            const loadingEl = document.getElementById('loading');
+            const gridEl = document.getElementById('routesGrid');
+            
             try {
-                // Show cached data first
+                // Show cached first
                 const cached = localStorage.getItem(STORAGE_KEY);
-                if (cached) {
+                if (cached && !force) {
                     routesData = JSON.parse(cached);
                     renderRoutes();
-                    document.getElementById('loading').style.display = 'none';
-                    document.getElementById('routesGrid').style.display = 'grid';
+                    loadingEl.style.display = 'none';
+                    gridEl.style.display = 'grid';
                 }
                 
-                // Fetch fresh data
-                const response = await fetch(API_URL);
+                // Fetch fresh
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 10000);
+                
+                const response = await fetch(API_URL, { 
+                    signal: controller.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                clearTimeout(timeout);
+                
                 const data = await response.json();
                 
                 if (data.routes) {
@@ -145,25 +385,49 @@
                     document.getElementById('offlineBar').classList.remove('show');
                 }
             } catch (e) {
-                console.log('Using cached data');
+                console.log('Using cached data:', e.message);
                 document.getElementById('offlineBar').classList.add('show');
+                
                 if (!routesData.length) {
-                    document.getElementById('loading').textContent = 'Нет данных. Проверьте интернет.';
+                    const cached = localStorage.getItem(STORAGE_KEY);
+                    if (cached) {
+                        routesData = JSON.parse(cached);
+                        renderRoutes();
+                        loadingEl.style.display = 'none';
+                        gridEl.style.display = 'grid';
+                    } else {
+                        loadingEl.innerHTML = '❌ Не удалось загрузить. Проверьте интернет.';
+                    }
                 }
             }
         }
 
         function renderRoutes() {
             const grid = document.getElementById('routesGrid');
-            let filtered = routesData.filter(r => currentFilter === 'all' || r.type === currentFilter);
+            const filtered = routesData.filter(r => 
+                currentFilter === 'all' || r.type === currentFilter
+            );
             
             grid.innerHTML = filtered.map(route => `
-                <div class="route-card" onclick="alert('${route.name}')">
+                <div class="route-card" onclick="openRoute(${route.id})">
                     <div class="route-number">${route.number}</div>
                     <span class="route-type ${route.type}">${getTypeName(route.type)}</span>
-                    <div style="font-size:0.8rem; color:#666; margin-top:5px;">${route.name}</div>
+                    <div class="route-name">${route.name}</div>
                 </div>
             `).join('');
+        }
+
+        function openRoute(routeId) {
+            const route = routesData.find(r => r.id === routeId);
+            if (!route) return;
+            
+            // Simple alert for now - can be expanded to full route view
+            const forwardTimes = route.forward?.times?.slice(0, 5).join(', ') || 'Нет данных';
+            const backwardTimes = route.backward?.times?.slice(0, 5).join(', ') || 'Нет данных';
+            
+            alert(`${route.number} — ${route.name}\n\n` +
+                  `🡆 ${route.forward?.name || 'Туда'}:\n${forwardTimes}\n\n` +
+                  `🡄 ${route.backward?.name || 'Обратно'}:\n${backwardTimes}`);
         }
 
         function getTypeName(type) {
@@ -187,15 +451,53 @@
                 now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
         }
 
+        // Pull to refresh (iOS style)
+        let touchStartY = 0;
+        let isPulling = false;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+            if (window.scrollY === 0) isPulling = true;
+        }, { passive: true });
+        
+        document.addEventListener('touchmove', (e) => {
+            if (!isPulling || window.scrollY > 0) return;
+            
+            const pull = e.touches[0].clientY - touchStartY;
+            const ptrIndicator = document.getElementById('ptrIndicator');
+            
+            if (pull > 60) {
+                ptrIndicator.classList.add('show');
+                if (pull > 100) {
+                    isPulling = false;
+                    ptrIndicator.classList.remove('show');
+                    loadRoutes(true);
+                }
+            }
+        }, { passive: true });
+        
+        document.addEventListener('touchend', () => {
+            isPulling = false;
+            document.getElementById('ptrIndicator').classList.remove('show');
+        });
+
         // Init
         document.addEventListener('DOMContentLoaded', () => {
             updateTime();
             loadRoutes();
+            checkInstallBanner();
             setInterval(updateTime, 1000);
         });
 
-        // Sync when back online
-        window.addEventListener('online', loadRoutes);
+        // Sync when online
+        window.addEventListener('online', () => {
+            document.getElementById('offlineBar').classList.remove('show');
+            loadRoutes(true);
+        });
+        
+        window.addEventListener('offline', () => {
+            document.getElementById('offlineBar').classList.add('show');
+        });
     </script>
 </body>
 </html>
