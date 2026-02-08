@@ -2,1139 +2,200 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Автобусы Олёкминска</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
+    <title>Автобусы Олёкминск</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #667eea;
+            --primary-dark: #764ba2;
+            --secondary: #10b981;
+            --bg: #f5f7fa;
+            --card: #ffffff;
+            --text: #333333;
         }
-        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
         }
-        
-        /* Header */
         .header {
-            background: #1976D2;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            padding: 40px 20px 25px;
+            text-align: center;
+        }
+        .header h1 { font-size: 1.5rem; }
+        .current-time {
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .nav-tab {
+            flex: 1;
             padding: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .header-content {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .header h1 {
-            font-size: 1.25rem;
-            font-weight: 500;
-        }
-        
-        .header-actions {
-            display: flex;
-            gap: 8px;
-        }
-        
-        /* Buttons */
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .btn-primary {
-            background: #1976D2;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #1565C0;
-        }
-        
-        .btn-secondary {
-            background: #E3F2FD;
-            color: #1976D2;
-        }
-        
-        .btn-secondary:hover {
-            background: #BBDEFB;
-        }
-        
-        .btn-danger {
-            background: #FFEBEE;
-            color: #C62828;
-        }
-        
-        .btn-danger:hover {
-            background: #FFCDD2;
-        }
-        
-        .btn-small {
-            padding: 4px 12px;
-            font-size: 0.75rem;
-        }
-        
-        /* Container */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 16px;
-        }
-        
-        /* Announcements */
-        .announcements-section {
-            margin-bottom: 24px;
-        }
-        
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        
-        .section-title {
-            font-size: 1.125rem;
-            font-weight: 500;
-            color: #424242;
-        }
-        
-        .announcement-card {
-            background: #FFF3E0;
-            border-left: 4px solid #FF9800;
-            padding: 12px 16px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            position: relative;
-        }
-        
-        .announcement-card.urgent {
-            background: #FFEBEE;
-            border-left-color: #F44336;
-        }
-        
-        .announcement-title {
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-        
-        .announcement-text {
-            font-size: 0.875rem;
-            color: #666;
-        }
-        
-        .announcement-date {
-            font-size: 0.75rem;
-            color: #999;
-            margin-top: 4px;
-        }
-        
-        .announcement-delete {
-            position: absolute;
-            top: 8px;
-            right: 8px;
             background: none;
             border: none;
-            color: #999;
+            font-size: 0.9rem;
+            color: #666;
             cursor: pointer;
-            font-size: 1.25rem;
-            line-height: 1;
         }
-        
-        .announcement-delete:hover {
-            color: #F44336;
-        }
-        
-        /* Routes List */
-        .routes-list {
-            display: flex;
-            flex-direction: column;
+        .nav-tab.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
+        .main-content { padding: 20px; }
+        .routes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 12px;
         }
-        
+        @media (min-width: 768px) {
+            .routes-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (min-width: 1024px) {
+            .routes-grid { grid-template-columns: repeat(4, 1fr); }
+        }
         .route-card {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        
-        .route-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        
-        .route-number {
-            width: 56px;
-            height: 56px;
-            background: #E3F2FD;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #1976D2;
-            flex-shrink: 0;
-        }
-        
-        .route-info {
-            flex: 1;
-        }
-        
-        .route-name {
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-        
-        .route-interval {
-            font-size: 0.875rem;
-            color: #666;
-        }
-        
-        .route-arrow {
-            color: #1976D2;
-            font-size: 1.5rem;
-        }
-        
-        /* Route Detail */
-        .route-detail {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .detail-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-        
-        .detail-title {
-            font-size: 1.25rem;
-            font-weight: 500;
-        }
-        
-        .detail-actions {
-            display: flex;
-            gap: 8px;
-        }
-        
-        /* Toggle */
-        .toggle-container {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        
-        .toggle-btn {
-            padding: 8px 24px;
-            border: 2px solid #1976D2;
-            background: white;
-            color: #1976D2;
-            border-radius: 24px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-        
-        .toggle-btn.active {
-            background: #1976D2;
-            color: white;
-        }
-        
-        /* Schedule Info */
-        .schedule-info {
-            text-align: center;
-            margin-bottom: 16px;
-            padding: 12px;
-            background: #F5F5F5;
-            border-radius: 8px;
-        }
-        
-        .schedule-info h3 {
-            margin-bottom: 8px;
-        }
-        
-        .schedule-info p {
-            color: #666;
-            font-size: 0.875rem;
-        }
-        
-        /* Stops */
-        .stops-section {
-            margin-bottom: 24px;
-        }
-        
-        .stops-title {
-            font-weight: 500;
-            margin-bottom: 12px;
-            color: #424242;
-        }
-        
-        .stop-item {
-            display: flex;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .stop-number {
-            width: 24px;
-            color: #1976D2;
-            font-weight: 500;
-        }
-        
-        /* Times Grid */
-        .times-section {
-            margin-bottom: 24px;
-        }
-        
-        .times-title {
-            font-weight: 500;
-            margin-bottom: 12px;
-            color: #424242;
-        }
-        
-        .times-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-        
-        .time-item {
-            padding: 8px;
-            text-align: center;
-            border-radius: 8px;
-            font-weight: 500;
-        }
-        
-        .time-item.future {
-            background: #E3F2FD;
-            color: #1976D2;
-        }
-        
-        .time-item.past {
-            background: #F5F5F5;
-            color: #999;
-        }
-        
-        /* Next Bus */
-        .next-bus {
-            background: #E8F5E9;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            margin-bottom: 16px;
-        }
-        
-        .next-bus-label {
-            font-size: 0.875rem;
-            color: #2E7D32;
-            margin-bottom: 4px;
-        }
-        
-        .next-bus-time {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #1B5E20;
-        }
-        
-        .next-bus.no-bus {
-            background: #FFEBEE;
-        }
-        
-        .next-bus.no-bus .next-bus-label,
-        .next-bus.no-bus .next-bus-time {
-            color: #C62828;
-        }
-        
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 16px;
-        }
-        
-        .modal {
-            background: white;
+            background: var(--card);
             border-radius: 16px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            padding: 16px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-title {
-            font-size: 1.25rem;
-            font-weight: 500;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             cursor: pointer;
+        }
+        .route-number { font-size: 2rem; font-weight: 800; color: var(--primary); }
+        .route-type { font-size: 0.7rem; text-transform: uppercase; padding: 2px 8px; border-radius: 10px; }
+        .route-type.urban { background: #dbeafe; color: #1e40af; }
+        .route-type.suburban { background: #d1fae5; color: #065f46; }
+        .offline-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: #ff9800; color: white;
+            text-align: center; padding: 10px;
+            display: none; z-index: 1000;
+        }
+        .offline-bar.show { display: block; }
+        .loading {
+            text-align: center;
+            padding: 40px;
             color: #666;
-        }
-        
-        .modal-body {
-            padding: 16px;
-        }
-        
-        .modal-footer {
-            padding: 16px;
-            border-top: 1px solid #eee;
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-        
-        /* Form */
-        .form-group {
-            margin-bottom: 16px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 4px;
-            font-weight: 500;
-            font-size: 0.875rem;
-        }
-        
-        .form-input,
-        .form-textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: inherit;
-        }
-        
-        .form-input:focus,
-        .form-textarea:focus {
-            outline: none;
-            border-color: #1976D2;
-        }
-        
-        .form-textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-        
-        .form-hint {
-            font-size: 0.75rem;
-            color: #666;
-            margin-top: 4px;
-        }
-        
-        /* Hidden */
-        .hidden {
-            display: none !important;
-        }
-        
-        /* Admin Actions */
-        .admin-actions {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .admin-actions-title {
-            font-weight: 500;
-            margin-bottom: 12px;
-            color: #424242;
-        }
-        
-        .admin-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        
-        /* Responsive */
-        @media (max-width: 480px) {
-            .times-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .header h1 {
-                font-size: 1rem;
-            }
         }
     </style>
 </head>
 <body>
+    <div class="offline-bar" id="offlineBar">📴 Офлайн режим — показано сохранённое расписание</div>
+    
     <header class="header">
-        <div class="header-content">
-            <h1 id="pageTitle">Автобусы Олёкминска</h1>
-            <div class="header-actions">
-                <button class="btn btn-secondary btn-small" onclick="showAdminPanel()">⚙️ Админ</button>
-            </div>
-        </div>
+        <h1>🚌 Автобусы Олёкминск</h1>
+        <div class="current-time" id="currentTime">--:--</div>
     </header>
-
-    <div class="container">
-        <!-- Admin Actions -->
-        <div id="adminPanel" class="admin-actions hidden">
-            <div class="admin-actions-title">Панель управления</div>
-            <div class="admin-buttons">
-                <button class="btn btn-primary btn-small" onclick="showAddRouteModal()">➕ Маршрут</button>
-                <button class="btn btn-primary btn-small" onclick="showAddAnnouncementModal()">📢 Объявление</button>
-                <button class="btn btn-secondary btn-small" onclick="exportData()">💾 Скачать JSON</button>
-                <button class="btn btn-secondary btn-small" onclick="document.getElementById('importFile').click()">📂 Загрузить JSON</button>
-                <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(this)">
-                <button class="btn btn-danger btn-small" onclick="resetData()">🔄 Сбросить</button>
-                <button class="btn btn-secondary btn-small" onclick="hideAdminPanel()">✖️ Закрыть</button>
-            </div>
-        </div>
-
-        <!-- Announcements -->
-        <div class="announcements-section">
-            <div class="section-header">
-                <h2 class="section-title">📢 Объявления</h2>
-            </div>
-            <div id="announcementsList"></div>
-        </div>
-
-        <!-- Routes List -->
-        <div id="routesList" class="routes-list"></div>
-
-        <!-- Route Detail -->
-        <div id="routeDetail" class="route-detail hidden"></div>
-    </div>
-
-    <!-- Modal -->
-    <div id="modal" class="modal-overlay hidden">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 id="modalTitle" class="modal-title">Заголовок</h3>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
-            </div>
-            <div id="modalBody" class="modal-body"></div>
-            <div id="modalFooter" class="modal-footer"></div>
-        </div>
-    </div>
+    
+    <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="all">Все</button>
+        <button class="nav-tab" data-tab="urban">Городские</button>
+        <button class="nav-tab" data-tab="suburban">Пригород</button>
+        <button class="nav-tab" data-tab="intercity">Межгород</button>
+    </nav>
+    
+    <main class="main-content">
+        <div id="loading" class="loading">Загрузка расписания...</div>
+        <div id="routesGrid" class="routes-grid" style="display:none;"></div>
+    </main>
 
     <script>
-        // Default data
-        const defaultRoutes = [
-            {
-                id: 1,
-                number: "1",
-                name: "Автовокзал — Дача",
-                interval: "20-25 мин",
-                weekday: {
-                    start: "07:00",
-                    end: "21:07",
-                    times: ["07:00", "07:42", "07:59", "08:32", "08:49", "10:07", "10:32", "10:57", "11:47", "12:37", "13:27", "14:17", "16:07", "16:57", "17:47", "18:37", "19:27", "20:17", "21:07"]
-                },
-                weekend: {
-                    start: "07:00",
-                    end: "20:42",
-                    times: ["07:00", "07:34", "07:50", "08:24", "08:40", "09:30", "09:57", "10:47", "11:22", "12:12", "13:02", "13:52", "14:42", "15:32", "16:32", "17:22", "18:12", "19:02", "19:27", "20:42"]
-                },
-                stops: ["Автовокзал", "Центральная площадь", "Школа №2", "Дача"]
-            },
-            {
-                id: 2,
-                number: "2",
-                name: "Автовокзал — Авиапорт",
-                interval: "40-60 мин",
-                weekday: {
-                    start: "07:00",
-                    end: "20:30",
-                    times: ["07:00", "07:40", "08:20", "09:30", "11:00", "12:20", "13:00", "13:40", "14:40", "16:40", "17:40", "18:00", "18:40", "19:00", "20:10", "20:30"]
-                },
-                weekend: {
-                    start: "07:40",
-                    end: "20:30",
-                    times: ["07:40", "08:20", "12:20", "13:00", "13:40", "14:40", "16:40", "17:20", "18:00", "18:40", "19:00", "20:10", "20:30"]
-                },
-                stops: ["Автовокзал", "Центральный рынок", "Технический университет", "Авиапорт"]
-            },
-            {
-                id: 5,
-                number: "5",
-                name: "Автовокзал — ПНДИ",
-                interval: "25-35 мин",
-                weekday: {
-                    start: "07:25",
-                    end: "20:17",
-                    times: ["07:25", "08:15", "09:05", "09:42", "11:22", "12:12", "13:02", "13:52", "14:42", "15:42", "16:32", "17:22", "18:12", "19:02", "20:17"]
-                },
-                weekend: {
-                    start: "07:25",
-                    end: "19:52",
-                    times: ["07:25", "08:15", "09:05", "10:32", "11:22", "12:12", "13:02", "13:52", "15:42", "16:32", "17:22", "18:12", "19:02", "19:52"]
-                },
-                stops: ["Автовокзал", "Школа №3", "Поликлиника", "ПНДИ"]
-            },
-            {
-                id: 6,
-                number: "6",
-                name: "Автовокзал — Новостройки — Поповские поля",
-                interval: "30-90 мин",
-                weekday: {
-                    start: "07:20",
-                    end: "18:10",
-                    times: ["07:20", "08:15", "12:30", "13:30", "15:00", "17:00", "18:10"]
-                },
-                weekend: {
-                    start: "07:20",
-                    end: "13:30",
-                    times: ["07:20", "12:30", "13:30"]
-                },
-                stops: ["Автовокзал", "Новостройки", "Поповские поля"]
-            },
-            {
-                id: 7,
-                number: "7",
-                name: "Автовокзал — Нефтебаза",
-                interval: "60-90 мин",
-                weekday: {
-                    start: "07:05",
-                    end: "18:35",
-                    times: ["07:05", "08:55", "12:30", "14:30", "16:20", "17:55"]
-                },
-                weekend: {
-                    start: "07:15",
-                    end: "15:10",
-                    times: ["07:15", "12:30", "14:30"]
-                },
-                stops: ["Автовокзал", "Промзона", "Нефтебаза"]
-            }
-        ];
+        // API Configuration - замените на ваш URL
+        const API_URL = 'https://your-api.com/api/routes';
+        
+        // LocalStorage
+        const STORAGE_KEY = 'bus_routes_v1';
+        let routesData = [];
+        let currentFilter = 'all';
 
-        // State
-        let routes = [];
-        let announcements = [];
-        let currentRoute = null;
-
-        // Initialize
-        function init() {
-            loadData();
-            renderRoutes();
-            renderAnnouncements();
-        }
-
-        // Load data from localStorage
-        function loadData() {
-            const savedRoutes = localStorage.getItem('busRoutes');
-            const savedAnnouncements = localStorage.getItem('busAnnouncements');
-            
-            routes = savedRoutes ? JSON.parse(savedRoutes) : [...defaultRoutes];
-            announcements = savedAnnouncements ? JSON.parse(savedAnnouncements) : [];
-        }
-
-        // Save data to localStorage
-        function saveData() {
-            localStorage.setItem('busRoutes', JSON.stringify(routes));
-            localStorage.setItem('busAnnouncements', JSON.stringify(announcements));
-        }
-
-        // Render routes list
-        function renderRoutes() {
-            const container = document.getElementById('routesList');
-            container.innerHTML = routes.map(route => `
-                <div class="route-card" onclick="showRouteDetail(${route.id})">
-                    <div class="route-number">${route.number}</div>
-                    <div class="route-info">
-                        <div class="route-name">${route.name}</div>
-                        <div class="route-interval">Интервал: ${route.interval}</div>
-                    </div>
-                    <div class="route-arrow">›</div>
-                </div>
-            `).join('');
-        }
-
-        // Render announcements
-        function renderAnnouncements() {
-            const container = document.getElementById('announcementsList');
-            
-            if (announcements.length === 0) {
-                container.innerHTML = '<p style="color: #999; font-size: 0.875rem;">Нет объявлений</p>';
-                return;
-            }
-            
-            container.innerHTML = announcements.map((ann, index) => `
-                <div class="announcement-card ${ann.urgent ? 'urgent' : ''}">
-                    <button class="announcement-delete" onclick="deleteAnnouncement(${index}); event.stopPropagation();">&times;</button>
-                    <div class="announcement-title">${ann.title}</div>
-                    <div class="announcement-text">${ann.text}</div>
-                    <div class="announcement-date">${ann.date}</div>
-                </div>
-            `).join('');
-        }
-
-        // Show route detail
-        function showRouteDetail(routeId) {
-            currentRoute = routes.find(r => r.id === routeId);
-            if (!currentRoute) return;
-
-            document.getElementById('routesList').classList.add('hidden');
-            document.querySelector('.announcements-section').classList.add('hidden');
-            
-            const detail = document.getElementById('routeDetail');
-            detail.classList.remove('hidden');
-            
-            renderRouteDetail();
-        }
-
-        // Render route detail
-        function renderRouteDetail(isWeekend = false) {
-            if (!currentRoute) return;
-            
-            const schedule = isWeekend ? currentRoute.weekend : currentRoute.weekday;
-            const nextBus = findNextBus(schedule.times);
-            
-            const container = document.getElementById('routeDetail');
-            container.innerHTML = `
-                <div class="detail-header">
-                    <h2 class="detail-title">Маршрут ${currentRoute.number}</h2>
-                    <div class="detail-actions">
-                        <button class="btn btn-secondary btn-small" onclick="showEditRouteModal()">✏️ Редактировать</button>
-                        <button class="btn btn-danger btn-small" onclick="deleteRoute()">🗑️ Удалить</button>
-                    </div>
-                </div>
-                
-                <div class="toggle-container">
-                    <button class="toggle-btn ${!isWeekend ? 'active' : ''}" onclick="renderRouteDetail(false)">Будни</button>
-                    <button class="toggle-btn ${isWeekend ? 'active' : ''}" onclick="renderRouteDetail(true)">Выходные</button>
-                </div>
-                
-                <div class="schedule-info">
-                    <h3>${currentRoute.name}</h3>
-                    <p>Интервал: ${currentRoute.interval}</p>
-                    <p>Работает: ${schedule.start} — ${schedule.end}</p>
-                </div>
-                
-                ${nextBus ? `
-                    <div class="next-bus">
-                        <div class="next-bus-label">Ближайший автобус</div>
-                        <div class="next-bus-time">${nextBus}</div>
-                    </div>
-                ` : `
-                    <div class="next-bus no-bus">
-                        <div class="next-bus-label">Ближайший автобус</div>
-                        <div class="next-bus-time">На сегодня нет</div>
-                    </div>
-                `}
-                
-                <div class="stops-section">
-                    <div class="stops-title">Остановки:</div>
-                    ${currentRoute.stops.map((stop, i) => `
-                        <div class="stop-item">
-                            <span class="stop-number">${i + 1}.</span>
-                            <span>${stop}</span>
-                        </div>
-                    `).join('')}
-                </div>
-                
-                <div class="times-section">
-                    <div class="times-title">Время отправления:</div>
-                    <div class="times-grid">
-                        ${schedule.times.map(time => {
-                            const isPast = isTimePast(time);
-                            return `<div class="time-item ${isPast ? 'past' : 'future'}">${time}</div>`;
-                        }).join('')}
-                    </div>
-                </div>
-                
-                <button class="btn btn-secondary" style="width: 100%; margin-top: 16px;" onclick="backToList()">← Назад к списку</button>
-            `;
-        }
-
-        // Check if time is past
-        function isTimePast(timeStr) {
-            const now = new Date();
-            const [hours, minutes] = timeStr.split(':').map(Number);
-            const time = new Date();
-            time.setHours(hours, minutes, 0);
-            return time < now;
-        }
-
-        // Find next bus
-        function findNextBus(times) {
-            const now = new Date();
-            for (const timeStr of times) {
-                const [hours, minutes] = timeStr.split(':').map(Number);
-                const time = new Date();
-                time.setHours(hours, minutes, 0);
-                if (time >= now) return timeStr;
-            }
-            return null;
-        }
-
-        // Back to list
-        function backToList() {
-            document.getElementById('routeDetail').classList.add('hidden');
-            document.getElementById('routesList').classList.remove('hidden');
-            document.querySelector('.announcements-section').classList.remove('hidden');
-            currentRoute = null;
-        }
-
-        // Admin panel
-        function showAdminPanel() {
-            document.getElementById('adminPanel').classList.remove('hidden');
-        }
-
-        function hideAdminPanel() {
-            document.getElementById('adminPanel').classList.add('hidden');
-        }
-
-        // Modal functions
-        function showModal(title, body, footer) {
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalBody').innerHTML = body;
-            document.getElementById('modalFooter').innerHTML = footer;
-            document.getElementById('modal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
-        }
-
-        // Add route modal
-        function showAddRouteModal() {
-            const body = `
-                <div class="form-group">
-                    <label class="form-label">Номер маршрута</label>
-                    <input type="text" id="routeNumber" class="form-input" placeholder="Например: 8">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Название</label>
-                    <input type="text" id="routeName" class="form-input" placeholder="Например: Автовокзал — Больница">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Интервал</label>
-                    <input type="text" id="routeInterval" class="form-input" placeholder="Например: 20-30 мин">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Время отправления (будни)</label>
-                    <textarea id="weekdayTimes" class="form-textarea" placeholder="07:00, 07:30, 08:00..."></textarea>
-                    <div class="form-hint">Введите время через запятую</div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Время отправления (выходные)</label>
-                    <textarea id="weekendTimes" class="form-textarea" placeholder="08:00, 09:00, 10:00..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Остановки</label>
-                    <textarea id="routeStops" class="form-textarea" placeholder="Остановка 1, Остановка 2, Остановка 3..."></textarea>
-                    <div class="form-hint">Введите через запятую</div>
-                </div>
-            `;
-            
-            const footer = `
-                <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-                <button class="btn btn-primary" onclick="saveNewRoute()">Сохранить</button>
-            `;
-            
-            showModal('Добавить маршрут', body, footer);
-        }
-
-        // Save new route
-        function saveNewRoute() {
-            const number = document.getElementById('routeNumber').value.trim();
-            const name = document.getElementById('routeName').value.trim();
-            const interval = document.getElementById('routeInterval').value.trim();
-            const weekdayTimesStr = document.getElementById('weekdayTimes').value.trim();
-            const weekendTimesStr = document.getElementById('weekendTimes').value.trim();
-            const stopsStr = document.getElementById('routeStops').value.trim();
-            
-            if (!number || !name) {
-                alert('Заполните номер и название маршрута');
-                return;
-            }
-            
-            const weekdayTimes = weekdayTimesStr ? weekdayTimesStr.split(',').map(t => t.trim()) : [];
-            const weekendTimes = weekendTimesStr ? weekendTimesStr.split(',').map(t => t.trim()) : [];
-            const stops = stopsStr ? stopsStr.split(',').map(s => s.trim()) : [];
-            
-            const newRoute = {
-                id: Date.now(),
-                number,
-                name,
-                interval: interval || '—',
-                weekday: {
-                    start: weekdayTimes[0] || '—',
-                    end: weekdayTimes[weekdayTimes.length - 1] || '—',
-                    times: weekdayTimes
-                },
-                weekend: {
-                    start: weekendTimes[0] || '—',
-                    end: weekendTimes[weekendTimes.length - 1] || '—',
-                    times: weekendTimes
-                },
-                stops
-            };
-            
-            routes.push(newRoute);
-            saveData();
-            renderRoutes();
-            closeModal();
-        }
-
-        // Edit route modal
-        function showEditRouteModal() {
-            if (!currentRoute) return;
-            
-            const body = `
-                <div class="form-group">
-                    <label class="form-label">Номер маршрута</label>
-                    <input type="text" id="editRouteNumber" class="form-input" value="${currentRoute.number}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Название</label>
-                    <input type="text" id="editRouteName" class="form-input" value="${currentRoute.name}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Интервал</label>
-                    <input type="text" id="editRouteInterval" class="form-input" value="${currentRoute.interval}">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Время отправления (будни)</label>
-                    <textarea id="editWeekdayTimes" class="form-textarea">${currentRoute.weekday.times.join(', ')}</textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Время отправления (выходные)</label>
-                    <textarea id="editWeekendTimes" class="form-textarea">${currentRoute.weekend.times.join(', ')}</textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Остановки</label>
-                    <textarea id="editRouteStops" class="form-textarea">${currentRoute.stops.join(', ')}</textarea>
-                </div>
-            `;
-            
-            const footer = `
-                <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-                <button class="btn btn-primary" onclick="updateRoute()">Сохранить</button>
-            `;
-            
-            showModal('Редактировать маршрут', body, footer);
-        }
-
-        // Update route
-        function updateRoute() {
-            if (!currentRoute) return;
-            
-            const number = document.getElementById('editRouteNumber').value.trim();
-            const name = document.getElementById('editRouteName').value.trim();
-            const interval = document.getElementById('editRouteInterval').value.trim();
-            const weekdayTimesStr = document.getElementById('editWeekdayTimes').value.trim();
-            const weekendTimesStr = document.getElementById('editWeekendTimes').value.trim();
-            const stopsStr = document.getElementById('editRouteStops').value.trim();
-            
-            const weekdayTimes = weekdayTimesStr ? weekdayTimesStr.split(',').map(t => t.trim()) : [];
-            const weekendTimes = weekendTimesStr ? weekendTimesStr.split(',').map(t => t.trim()) : [];
-            const stops = stopsStr ? stopsStr.split(',').map(s => s.trim()) : [];
-            
-            currentRoute.number = number;
-            currentRoute.name = name;
-            currentRoute.interval = interval;
-            currentRoute.weekday = {
-                start: weekdayTimes[0] || '—',
-                end: weekdayTimes[weekdayTimes.length - 1] || '—',
-                times: weekdayTimes
-            };
-            currentRoute.weekend = {
-                start: weekendTimes[0] || '—',
-                end: weekendTimes[weekendTimes.length - 1] || '—',
-                times: weekendTimes
-            };
-            currentRoute.stops = stops;
-            
-            saveData();
-            renderRouteDetail();
-            renderRoutes();
-            closeModal();
-        }
-
-        // Delete route
-        function deleteRoute() {
-            if (!currentRoute) return;
-            
-            if (!confirm('Удалить этот маршрут?')) return;
-            
-            routes = routes.filter(r => r.id !== currentRoute.id);
-            saveData();
-            backToList();
-            renderRoutes();
-        }
-
-        // Add announcement modal
-        function showAddAnnouncementModal() {
-            const body = `
-                <div class="form-group">
-                    <label class="form-label">Заголовок</label>
-                    <input type="text" id="annTitle" class="form-input" placeholder="Например: Изменение расписания">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Текст объявления</label>
-                    <textarea id="annText" class="form-textarea" placeholder="Введите текст объявления..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">
-                        <input type="checkbox" id="annUrgent"> Срочное объявление
-                    </label>
-                </div>
-            `;
-            
-            const footer = `
-                <button class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-                <button class="btn btn-primary" onclick="saveAnnouncement()">Сохранить</button>
-            `;
-            
-            showModal('Добавить объявление', body, footer);
-        }
-
-        // Save announcement
-        function saveAnnouncement() {
-            const title = document.getElementById('annTitle').value.trim();
-            const text = document.getElementById('annText').value.trim();
-            const urgent = document.getElementById('annUrgent').checked;
-            
-            if (!title || !text) {
-                alert('Заполните заголовок и текст');
-                return;
-            }
-            
-            const announcement = {
-                title,
-                text,
-                urgent,
-                date: new Date().toLocaleDateString('ru-RU')
-            };
-            
-            announcements.unshift(announcement);
-            saveData();
-            renderAnnouncements();
-            closeModal();
-        }
-
-        // Delete announcement
-        function deleteAnnouncement(index) {
-            if (!confirm('Удалить это объявление?')) return;
-            
-            announcements.splice(index, 1);
-            saveData();
-            renderAnnouncements();
-        }
-
-        // Export data
-        function exportData() {
-            const data = {
-                routes,
-                announcements,
-                exportDate: new Date().toISOString()
-            };
-            
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `bus-schedule-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        // Import data
-        function importData(input) {
-            const file = input.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    
-                    if (data.routes) {
-                        routes = data.routes;
-                    }
-                    if (data.announcements) {
-                        announcements = data.announcements;
-                    }
-                    
-                    saveData();
+        // Load routes
+        async function loadRoutes() {
+            try {
+                // Show cached data first
+                const cached = localStorage.getItem(STORAGE_KEY);
+                if (cached) {
+                    routesData = JSON.parse(cached);
                     renderRoutes();
-                    renderAnnouncements();
-                    alert('Данные загружены успешно!');
-                } catch (err) {
-                    alert('Ошибка загрузки файла: ' + err.message);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('routesGrid').style.display = 'grid';
                 }
-            };
-            reader.readAsText(file);
-            input.value = '';
+                
+                // Fetch fresh data
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                if (data.routes) {
+                    routesData = data.routes;
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(routesData));
+                    renderRoutes();
+                    document.getElementById('offlineBar').classList.remove('show');
+                }
+            } catch (e) {
+                console.log('Using cached data');
+                document.getElementById('offlineBar').classList.add('show');
+                if (!routesData.length) {
+                    document.getElementById('loading').textContent = 'Нет данных. Проверьте интернет.';
+                }
+            }
         }
 
-        // Reset data
-        function resetData() {
-            if (!confirm('Сбросить все данные к начальным? Это удалит все изменения!')) return;
+        function renderRoutes() {
+            const grid = document.getElementById('routesGrid');
+            let filtered = routesData.filter(r => currentFilter === 'all' || r.type === currentFilter);
             
-            localStorage.removeItem('busRoutes');
-            localStorage.removeItem('busAnnouncements');
-            routes = [...defaultRoutes];
-            announcements = [];
-            saveData();
-            renderRoutes();
-            renderAnnouncements();
-            backToList();
+            grid.innerHTML = filtered.map(route => `
+                <div class="route-card" onclick="alert('${route.name}')">
+                    <div class="route-number">${route.number}</div>
+                    <span class="route-type ${route.type}">${getTypeName(route.type)}</span>
+                    <div style="font-size:0.8rem; color:#666; margin-top:5px;">${route.name}</div>
+                </div>
+            `).join('');
         }
 
-        // Close modal on overlay click
-        document.getElementById('modal').addEventListener('click', (e) => {
-            if (e.target.id === 'modal') closeModal();
+        function getTypeName(type) {
+            return { urban: 'Городской', suburban: 'Пригород', intercity: 'Междугородний' }[type] || type;
+        }
+
+        // Tab switching
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentFilter = tab.dataset.tab;
+                renderRoutes();
+            });
         });
 
-        // Initialize on load
-        init();
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = 
+                now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTime();
+            loadRoutes();
+            setInterval(updateTime, 1000);
+        });
+
+        // Sync when back online
+        window.addEventListener('online', loadRoutes);
     </script>
 </body>
 </html>
